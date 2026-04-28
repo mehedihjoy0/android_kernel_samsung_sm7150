@@ -56,7 +56,15 @@ jobs:
             zip \
             zstd
 
-      - name: Download latest Google clang
+      - name: Cache clang
+        id: cache-clang
+        uses: actions/cache@v4
+        with:
+          path: llvm-21
+          key: clang-r29-r563880c
+
+      - name: Download Google clang
+        if: steps.cache-clang.outputs.cache-hit != 'true'
         run: |
           wget -O llvm.tar.gz https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/mirror-goog-main-llvm-toolchain-source/clang-r596125.tar.gz
           mkdir llvm-22; cd llvm-22
