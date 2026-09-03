@@ -1,15 +1,6 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (C) 2017 Google, Inc.
- *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
- * may be copied, distributed, and modified under those terms.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
  */
 
 #ifndef _LINUX_BINDER_ALLOC_H
@@ -84,10 +75,10 @@ struct binder_lru_page {
 /**
  * struct binder_alloc - per-binder proc state for binder allocator
  * @vma:                vm_area_struct passed to mmap_handler
- *                      (invariant after mmap)
+ *                      (invarient after mmap)
  * @tsk:                tid for task that called init for this proc
  *                      (invariant after init)
- * @vma_vm_mm:          copy of vma->vm_mm (invariant after mmap)
+ * @vma_vm_mm:          copy of vma->vm_mm (invarient after mmap)
  * @buffer:             base of per-proc address space mapped via mmap
  * @buffers:            list of all buffers for this proc
  * @free_buffers:       rb tree of buffers available for allocation
@@ -118,6 +109,7 @@ struct binder_alloc {
 	size_t free_async_space;
 	struct binder_lru_page *pages;
 	size_t buffer_size;
+	uint32_t buffer_free;
 	int pid;
 	size_t pages_high;
 	bool oneway_spam_detected;
@@ -131,27 +123,27 @@ static inline void binder_selftest_alloc(struct binder_alloc *alloc) {}
 enum lru_status binder_alloc_free_page(struct list_head *item,
 				       struct list_lru_one *lru,
 				       spinlock_t *lock, void *cb_arg);
-struct binder_buffer *binder_alloc_new_buf(struct binder_alloc *alloc,
-					   size_t data_size,
-					   size_t offsets_size,
-					   size_t extra_buffers_size,
-					   int is_async,
-					   int pid);
-void binder_alloc_init(struct binder_alloc *alloc);
-int binder_alloc_shrinker_init(void);
-void binder_alloc_shrinker_exit(void);
-void binder_alloc_vma_close(struct binder_alloc *alloc);
-struct binder_buffer *
+extern struct binder_buffer *binder_alloc_new_buf(struct binder_alloc *alloc,
+						  size_t data_size,
+						  size_t offsets_size,
+						  size_t extra_buffers_size,
+						  int is_async,
+						  int pid);
+extern void binder_alloc_init(struct binder_alloc *alloc);
+extern int binder_alloc_shrinker_init(void);
+extern void binder_alloc_shrinker_exit(void);
+extern void binder_alloc_vma_close(struct binder_alloc *alloc);
+extern struct binder_buffer *
 binder_alloc_prepare_to_free(struct binder_alloc *alloc,
 			     uintptr_t user_ptr);
-void binder_alloc_free_buf(struct binder_alloc *alloc,
-			   struct binder_buffer *buffer);
-int binder_alloc_mmap_handler(struct binder_alloc *alloc,
-			      struct vm_area_struct *vma);
-void binder_alloc_deferred_release(struct binder_alloc *alloc);
-int binder_alloc_get_allocated_count(struct binder_alloc *alloc);
-void binder_alloc_print_allocated(struct seq_file *m,
-				  struct binder_alloc *alloc);
+extern void binder_alloc_free_buf(struct binder_alloc *alloc,
+				  struct binder_buffer *buffer);
+extern int binder_alloc_mmap_handler(struct binder_alloc *alloc,
+				     struct vm_area_struct *vma);
+extern void binder_alloc_deferred_release(struct binder_alloc *alloc);
+extern int binder_alloc_get_allocated_count(struct binder_alloc *alloc);
+extern void binder_alloc_print_allocated(struct seq_file *m,
+					 struct binder_alloc *alloc);
 void binder_alloc_print_pages(struct seq_file *m,
 			      struct binder_alloc *alloc);
 
@@ -179,17 +171,16 @@ binder_alloc_copy_user_to_buffer(struct binder_alloc *alloc,
 				 const void __user *from,
 				 size_t bytes);
 
-void binder_alloc_copy_to_buffer(struct binder_alloc *alloc,
-				 struct binder_buffer *buffer,
-				 binder_size_t buffer_offset,
-				 void *src,
-				 size_t bytes);
+int binder_alloc_copy_to_buffer(struct binder_alloc *alloc,
+				struct binder_buffer *buffer,
+				binder_size_t buffer_offset,
+				void *src,
+				size_t bytes);
 
-void binder_alloc_copy_from_buffer(struct binder_alloc *alloc,
-				   void *dest,
-				   struct binder_buffer *buffer,
-				   binder_size_t buffer_offset,
-				   size_t bytes);
+int binder_alloc_copy_from_buffer(struct binder_alloc *alloc,
+				  void *dest,
+				  struct binder_buffer *buffer,
+				  binder_size_t buffer_offset,
+				  size_t bytes);
 
 #endif /* _LINUX_BINDER_ALLOC_H */
-
