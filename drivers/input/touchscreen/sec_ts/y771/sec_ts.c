@@ -1590,10 +1590,7 @@ static void sec_ts_read_event(struct sec_ts_data *ts)
 					if (p_gesture_status->gesture_id == SEC_GESTURE_ID_FOD_LONG || p_gesture_status->gesture_id == SEC_GESTURE_ID_FOD_NORMAL) {
 						ts->scrub_id = SPONGE_EVENT_TYPE_FOD;
 						input_info(true, &ts->client->dev, "%s: FOD: %s\n", __func__, p_gesture_status->gesture_id ? "normal" : "long");
-					if (!is_aosp)
 						input_report_key(ts->input_dev, KEY_BLACK_UI_GESTURE, 1);
-					ts->fod_pressed = true;
-					sysfs_notify(&ts->input_dev->dev.kobj, NULL, "fod_pressed");
 					} else if (p_gesture_status->gesture_id == SEC_GESTURE_ID_FOD_RELEASE) {
 						ts->scrub_id = SPONGE_EVENT_TYPE_FOD_RELEASE;
 						input_info(true, &ts->client->dev, "%s: FOD release\n", __func__);
